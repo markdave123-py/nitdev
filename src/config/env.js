@@ -16,6 +16,11 @@ export const config = {
     auth:{
         accessTokenSecretKey: process.env.ACCESS_TOKEN_SECRET,
         accessTokenExpire: process.env.AccessTokenExpire
+    },
+
+    mailer: {
+        email: process.env.maileruser,
+        password: process.env.mailerpass
     }
 
 

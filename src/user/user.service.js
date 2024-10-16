@@ -1,15 +1,17 @@
 import { executeQuery } from "../config/database.js";
 import { v4 as uuidv4 } from "uuid";
+import { generateVerificationToken } from "../utils/jwt.js";
 
 
 //create user query
 export const createUser = async (firstName, lastName, email,phoneNumber, password) => {
     try {
         const userId = uuidv4();
-        const query = `INSERT INTO users (Id, firstName, lastName, email, phoneNumber, password) 
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
-               
-        const result = await executeQuery(query, [userId, firstName, lastName, email,phoneNumber, password]);
+        const verificationToken = generateVerificationToken();
+        const query = `INSERT INTO users (Id, firstName, lastName, email, phoneNumber, password, verificationToken)
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+
+        const result = await executeQuery(query, [userId, firstName, lastName, email,phoneNumber, password, verificationToken]);
 
         return result;
     } catch (error) {
@@ -97,3 +99,40 @@ export const getAccount = async(userId) => {
         throw new Error(error);
     }
 };
+
+const query = `alter table users add column isverified boolean default false`;
+const query2 = `alter table users add column verificationToken text`;
+
+export const alterTable = async () => {
+    try {
+        await executeQuery(query);
+        await executeQuery(query2);
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+
+export const getUserByToken = async (token) => {
+    try {
+        const query = `SELECT * FROM users WHERE verificationtoken = $1`;
+
+        const [ result ] = await executeQuery(query, [token]);
+
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+export const verifyuser = async (userId) => {
+    try {
+        const query = `UPDATE users SET isverified = true WHERE id = $1 RETURNING *`;
+
+        const result = await executeQuery(query, [userId]);
+
+        return result;
+    } catch (error) {
+        throw new Error(error);
+    }
+}

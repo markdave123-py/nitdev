@@ -7,7 +7,7 @@ const pool = new Pool({
     max: 100,
     host: config.db.host,
     user: config.db.user,
-    database: config.db.database,
+    database: config.db.name,
     password: config.db.password,
     port: config.db.port
 });
@@ -39,10 +39,10 @@ const pool = new Pool({
 
 //using async and await to connect to database and execute query
 export const executeQuery = async (query, values = []) => {
-   
+
     try {
 
-        const client = await pool.connect(); // obtain a connection from the pool 
+        const client = await pool.connect(); // obtain a connection from the pool
 
         const result = await client.query(query, values); // execute the query
 
