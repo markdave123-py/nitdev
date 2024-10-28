@@ -21,6 +21,9 @@ export const config = {
     mailer: {
         email: process.env.maileruser,
         password: process.env.mailerpass
+    },
+    apilayer: {
+        apikey: process.env.APIKEY
     }
 
 

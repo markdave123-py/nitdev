@@ -12,6 +12,7 @@ import { depositRouter } from "./transaction/deposit/deposit.routes.js";
 import { withdrawalRouter } from "./transaction/withdrawal/withdrawal.routes.js";
 import { alterTable } from "./user/user.service.js";
 import { generateVerificationToken } from "./utils/jwt.js";
+import { converter } from "./utils/converter.js";
 
 
 const app = express();
@@ -35,5 +36,6 @@ app.listen(config.port, async () => {
     // await transferTable();
     // await withdrawalTable();
     // await alterTable();
+
     console.log(`server running on http://localhost:${config.port}`)
 });

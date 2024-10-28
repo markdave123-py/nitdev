@@ -1,10 +1,10 @@
 import { executeQuery } from "../../config/database.js";
 
 //function to make transfer
-export const  makeTransfer = async (senderAccountNum,  receiverAccountNum, amount) => {
+export const  makeTransfer = async (senderAccountNum,  receiverAccountNum, senderAmount, receiverAmount) => {
 
     try {
-        
+
         await executeQuery('BEGIN')
 
         const senderAccount = await executeQuery('select * from accounts where acctNumber = $1', [senderAccountNum])
@@ -13,8 +13,8 @@ export const  makeTransfer = async (senderAccountNum,  receiverAccountNum, amoun
             throw new Error('Sender account does not exist. ')
         }
 
-        if (parseFloat(senderAccount[0].balance) < amount){
-            throw new Error('Insufficient balance!!')
+        if (parseFloat(senderAccount[0].balance) < senderAmount) {
+          throw new Error("Insufficient balance!!");
         }
 
         const recieverAccount = await executeQuery('select * from accounts where acctNumber = $1', [receiverAccountNum])
@@ -23,9 +23,12 @@ export const  makeTransfer = async (senderAccountNum,  receiverAccountNum, amoun
             throw new Error('Reciever account does not exist.')
         }
 
-        await executeQuery('update accounts set balance = balance - $1 where acctNumber = $2', [amount, senderAccountNum])
+        await executeQuery('update accounts set balance = balance - $1 where acctNumber = $2', [senderAmount, senderAccountNum])
 
-        await executeQuery('update accounts set balance = balance + $1 where acctNumber = $2', [amount, receiverAccountNum])
+        await executeQuery(
+          "update accounts set balance = balance + $1 where acctNumber = $2",
+          [receiverAmount, receiverAccountNum]
+        );
 
         await  executeQuery('COMMIT');
 
@@ -58,7 +61,7 @@ export const accountFunction = async(accNum) => {
 //function to post to transfers table
 export const postTransfer = async (senderAccountNum, receiverAccountNum, amount) => {
     try {
-        
+
         const query = `INSERT INTO transfers (fromAccountNumber, toAccountNumber, amount) VALUES ($1, $2, $3) RETURNING *`;
 
         const result = await executeQuery(query, [senderAccountNum, receiverAccountNum, amount])

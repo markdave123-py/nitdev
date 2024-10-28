@@ -72,6 +72,10 @@ export const login = async (req, res) => {
             message: "No user with this email!!!"
         })
 
+        if (!user.isverified) return res.status(403).json({
+            message: "User not verified"
+        })
+
         //checking for password
         const isMatch = await comparePassword(password, user.password)
 
@@ -209,8 +213,6 @@ export const verifyUser = async (req, res, next) => {
     if (user.isverified) return res.status(400).json({
         message: "User already verified"
     })
-
-    user.isverified = true;
 
     await verifyuser(user.id);
 
